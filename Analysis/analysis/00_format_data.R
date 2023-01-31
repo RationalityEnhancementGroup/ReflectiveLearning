@@ -14,6 +14,7 @@ library(psych)
 library(lme4)
 library(lmerTest)
 library(interactions)
+library(rmcorr)
 
 # output models to latex
 library(stringr)
@@ -25,6 +26,7 @@ library(cowplot)
 library(dplyr)
 library(ggplot2)
 library(igraph)
+library(interactions)
 
 # 1. Import Data and Exclusion --------------------------------------------------------------
 
@@ -114,7 +116,6 @@ strategies <- appendStrategyProportions(c(2), 'exp')
 # NaNs and order
 strategies[is.na(strategies)] <- 0
 strategies <- strategies[order(strategies$score, decreasing=TRUE),]
-
 remove(appendStrategyProportions)
 
 # 4. Count Types ----------------------------------------
@@ -175,6 +176,7 @@ trial_frame$type <- strategies[t,]$type
 trial_frame$type_other <- trial_frame$type == 0
 trial_frame$type_fs <- trial_frame$type == 1
 trial_frame$type_ns <- trial_frame$type == 2
+trial_frame$type_np <- trial_frame$type == 3
 
 # add dv explicitly
 trial_frame$adaptive    <- trial_frame$cluster == 2
@@ -183,9 +185,14 @@ trial_frame$maladaptive <- trial_frame$cluster == 0
 
 # add baseline of first 3 trials
 t <- aggregate(.~ pid, subset(trial_frame, index < 4), FUN = sum)[c("pid","score","adaptive", "moderate", "maladaptive", "number_clicks", "strategyscore",
-                                                                    'type_ns', 'type_fs', 'type_other')]
+                                                                    'type_ns', 'type_fs', 'type_other', 'type_np')]
 colnames(t) <- c('pid', 'score_baseline', 'adaptive_baseline', 'moderate_baseline', 'maladaptive_baseline', 'clicks_baseline', 'strategyscore_baseline', 
-                 'type_ns_baseline', 'type_fs_baseline', 'type_other_baseline')
+                 'type_ns_baseline', 'type_fs_baseline', 'type_other_baseline', 'type_np_baseline')
+trial_frame <- merge(trial_frame, t, by='pid', all.x = TRUE, sort = FALSE)
+
+# add if used np in any trial
+t <- aggregate(.~ pid, trial_frame, FUN = sum)[c('pid','type_np')]
+colnames(t) <- c('pid','type_np_all')
 trial_frame <- merge(trial_frame, t, by='pid', all.x = TRUE, sort = FALSE)
 
 # transfer score baseline to mean
@@ -195,27 +202,128 @@ trial_frame$clicks_baseline <- trial_frame$clicks_baseline/3
 # sort trial frame (important!)
 trial_frame <- trial_frame[order(trial_frame$condition, trial_frame$pid, trial_frame$index),]
 
-remove(t)
 
+# add self-evaluation scores !
+trial_frame$noise <- trial_frame$score - trial_frame$strategyscore
+trial_frame$sea_cor <- 0
+trial_frame$luck <- 0
+trial_frame$skill <- 0
+
+# 1. calculate accurate self-evaluation
+for(pid in unique(df_prompts$pid)){
+  
+  # jump over excluded pids
+  if(pid %in% trial_frame$pid){
+    
+    # make custom df for participant
+    correlation_frame <- data.frame('eval' = df_prompts[df_prompts$pid == pid,]$eval)
+    
+    # noise component
+    c <- c()
+    for(i in c(3,6,9,12,15,18)){
+      c <- c(c, mean(trial_frame[trial_frame$pid == pid & trial_frame$index %in% c(i, i-1, i-2),]$noise))
+    }
+    correlation_frame$mean_noise <- c
+    
+    # score
+    c <- c()
+    for(i in c(3,6,9,12,15,18)){
+      c <- c(c, mean(trial_frame[trial_frame$pid == pid & trial_frame$index %in% c(i, i-1, i-2),]$score))
+    }
+    correlation_frame$mean_score <- c
+    
+    # strategy score
+    c <- c()
+    for(i in c(3,6,9,12,15,18)){
+      c <- c(c, mean(trial_frame[trial_frame$pid == pid & trial_frame$index %in% c(i, i-1, i-2),]$strategyscore))
+    }
+    correlation_frame$mean_strategyscore <- c
+    
+    
+    # final correlation calculation 
+    # 1. Correlation Sea:  
+    # noise component
+    model <- lm(eval ~ mean_noise, correlation_frame)
+    correlation_frame$residuals <- model$residuals
+    
+    # skill component
+    trial_frame[trial_frame$pid == pid,]$sea_cor <- cor(correlation_frame$residuals, correlation_frame$mean_strategyscore)
+  
+  
+    # 2. Linear Model Sea
+    # noise and skill component
+    correlation_frame$mean_noise <- scale(correlation_frame$mean_noise, scale = TRUE)
+    if( length(unique(correlation_frame$mean_strategyscore)) > 1){
+      correlation_frame$mean_strategyscore <- scale(correlation_frame$mean_strategyscore, scale = TRUE)
+    }
+    
+    # explicit estimates
+    model <- lm(eval ~ mean_noise + mean_strategyscore, correlation_frame)
+    
+    # extract estimates
+    luck <- model$coefficients['mean_noise']
+    skill <- model$coefficients['mean_strategyscore']
+    
+    # store estimates
+    trial_frame[trial_frame$pid == pid,]$luck <- luck
+    if(!is.na(skill)){ trial_frame[trial_frame$pid == pid,]$skill <- skill }
+  }
+}
+
+# correct scale: set luck and scale to interval 0-1
+trial_frame$skill <- trial_frame$skill - min(trial_frame$skill, na.rm = T)
+trial_frame$luck <- trial_frame$luck - min(trial_frame$luck, na.rm = T)
+trial_frame$sea_lm <- trial_frame$skill/(trial_frame$luck + trial_frame$skill)
+
+# count how many participants used a strategy
+t <- aggregate(pid ~ strategy, trial_frame, FUN = n_distinct)
+names(t)[2] <- 'all_usedby_freq'
+t$all_usedby_prop <- t$all_usedby_freq/nrow(df_valid)
+strategies <- merge(strategies, t, by='strategy')
+
+# count how many trials on average a participant used this strategy
+t <- aggregate(pid ~ strategy, trial_frame, FUN = table)
+t[,2][t[,2] == 0] <- NaN
+t[,2] <- rowMeans(t[,2], na.rm = T)
+names(t)[2] <- 'all_usedin_freq'
+t$all_usedin_prop <- t$all_usedin_freq/21
+strategies <- merge(strategies, t, by='strategy')
+
+# count how many participants used a strategy type
+t <- aggregate(pid ~ type, trial_frame, FUN = n_distinct)
+names(t)[2] <- 'all_usedby_freq'
+t$all_usedby_prop <- t$all_usedby_freq/nrow(df_valid)
+types <- merge(types, t, by='type')
+
+# count how many trials on average a participant used this strategy type
+t <- aggregate(pid ~ type, trial_frame, FUN = table)
+t[,2][t[,2] == 0] <- NaN
+t[,2] <- rowMeans(t[,2], na.rm = T)
+names(t)[2] <- 'all_usedin_freq'
+t$all_usedin_prop <- t$all_usedin_freq/21
+types <- merge(types, t, by='type')
+remove(t)
 
 # 7. Create Transition Dataframe ----------------------------------------
 
 # create transition frame from trial frame
 # the last trial has no transition
 last_trials <- (seq(21, to=nrow(trial_frame),by=21))
-transition_frame <- trial_frame[-last_trials, c('pid', 'index','condition', 'reflection', 'ncs',  'score',
+transition_frame <- trial_frame[-last_trials, c('pid', 'index','condition', 'reflection', 'ncs',  'sea_lm', 'sea_cor', 'score',
                                                 'cluster', 'strategyscore', 'adaptive', 'maladaptive', 'moderate',
                                                 'strategyscore_baseline', 'adaptive_baseline', 'maladaptive_baseline', 
-                                                'type_ns', 'type_fs', 'type_other',
-                                                'type_ns_baseline', 'type_fs_baseline', 'type_other_baseline'
+                                                'type_ns', 'type_fs', 'type_other', 'type_np',
+                                                'type_ns_baseline', 'type_fs_baseline', 'type_other_baseline', 'type_np_baseline',
+                                                'type_np_all'
                                                 )]
 
 # change names
-names(transition_frame) <- c('pid', 'transition','condition', 'reflection', 'ncs', 'prev_score', 
+names(transition_frame) <- c('pid', 'transition','condition', 'reflection', 'ncs', 'sea_lm', 'sea_cor', 'prev_score', 
                              'prev_cluster', 'prev_strategyscore', 'prev_adaptive', 'prev_maladaptive', 'prev_moderate',
                              'strategyscore_baseline', 'adaptive_baseline', 'maladaptive_baseline',
-                             'prev_type_ns', 'prev_type_fs', 'prev_type_other',
-                             'type_ns_baseline', 'type_fs_baseline', 'type_other_baseline')
+                             'prev_type_ns', 'prev_type_fs', 'prev_type_other', 'prev_type_np',
+                             'type_ns_baseline', 'type_fs_baseline', 'type_other_baseline', 'type_np_baseline',
+                             'type_np_all')
 
 # add engagement 
 transition_frame <- merge(transition_frame, df_prompts[,c(-2)], by = c('pid', 'transition'), all.x = TRUE, sort = TRUE)
@@ -240,6 +348,7 @@ transition_frame$clicks_change  <- diff(trial_frame$number_clicks)[-last_trials]
 
 # add score deltas
 transition_frame$score_delta <- diff(trial_frame$score)[-last_trials]
+transition_frame$strategyscore_delta <- diff(trial_frame$strategyscore)[-last_trials]
 transition_frame$strategyscore_delta <- diff(trial_frame$strategyscore)[-last_trials]
 
 # dv

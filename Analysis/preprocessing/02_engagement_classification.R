@@ -3,7 +3,6 @@
 
 #  0 Packages -------------------------------------------------------------
 
-
 library(psych)
 
 # 1 Import and Exclusion --------------------------------------------------------------
@@ -32,12 +31,13 @@ readArrayColumn <- function(col, ncol){
 }
 
 # storage
-df_prompts <- data.frame(matrix(nrow=0, ncol=5))
-names(df_prompts) <- c('pid', 'index', 'RT', 'length', 'content')
+df_prompts <- data.frame(matrix(nrow=0, ncol=6))
+names(df_prompts) <- c('pid', 'index', 'RT', 'length', 'content', 'eval')
 
 # convert RT and length
 RTs <- readArrayColumn(df$promptsRt, nprompts)
 lengths <- readArrayColumn(df$promptsLengths, nprompts)
+evals <- readArrayColumn(df$promptsEval, nprompts)
 
 # loop through participants
 for(i in 1:nrow(df)){
@@ -49,12 +49,13 @@ for(i in 1:nrow(df)){
   for(p in 1:nprompts){
     
     # store
-    df_prompts[nrow(df_prompts) + 1,] = c(df$pid[i], p*3, RTs[i,p], lengths[i, p], prompts[[1]][p])
+    df_prompts[nrow(df_prompts) + 1,] = c(df$pid[i], p*3, RTs[i,p], lengths[i, p], prompts[[1]][p], evals[i,p])
   }
 }
 df_prompts$index <- as.numeric(df_prompts$index)
 df_prompts$RT <- as.numeric(df_prompts$RT)
 df_prompts$length <- as.numeric(df_prompts$length)
+df_prompts$eval <- as.numeric(df_prompts$eval)
 
 # 3 Engagement Assessment ------------------------------------------------
 
@@ -102,8 +103,11 @@ df_annotated[df_annotated$meaningful & (df_annotated$RT > 144 | df_annotated$len
 # store
 write.csv(df_annotated,"../data/experiment/dataframe_prompts.csv", row.names = FALSE)
 
-
-
+# from storage
+df_annotated <- read.csv("../data/experiment/dataframe_prompts_copy.csv")
+df_prompts$meaningful <- df_annotated$meaningful
+df_prompts$engagement <- df_annotated$engagement
+write.csv(df_prompts,"../data/experiment/dataframe_prompts.csv", row.names = FALSE)
 
 # reset global environment
 rm(list = ls())

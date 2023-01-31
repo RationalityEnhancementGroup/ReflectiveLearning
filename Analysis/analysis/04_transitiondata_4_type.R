@@ -13,6 +13,8 @@ model_formula <- "reflection +
                   ncs:prompt + ncs:prompt:reflection + 
                   prev_type_other + prev_type_other:reflection + 
                   prev_type_other:prompt + prev_type_other:prompt:reflection + 
+                  prev_type_np + prev_type_np:reflection + 
+                  prev_type_np:prompt + prev_type_np:prompt:reflection +
                   prev_type_ns + prev_type_ns:reflection + 
                   prev_type_ns:prompt + prev_type_ns:prompt:reflection +
                   (1|pid)"
@@ -33,7 +35,6 @@ df$prompt <- factor(df$prompt)
 # 2 Change of planning (binary) -----------------------------------------------------------------
 
 # -- -- -- Adaptiveness change
-
 # fit model
 model <- fitModel_glm('cluster_change', model_formula, df)
 
@@ -105,4 +106,3 @@ storeModel(model, model_path, sprintf('%i_clicks-magnitude', max(N)),  sprintf('
 applyBHCorection(c('cluster-change', 'type-change', 'strategy-change'), '08-transitiondata')
 applyBHCorection(c('cluster-magnitude', 'strategy-magnitude'), '08-transitiondata')
 applyBHCorection(c('clicks-change', 'clicks-magnitude'), '08-transitiondata')
-

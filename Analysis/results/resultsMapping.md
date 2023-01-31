@@ -38,9 +38,9 @@ Here is information on where the statistics that are reported in the paper can b
       * Open variable `types` in workspace
       * % of trials in which near-/far-sighted strategies were used
     * results/tex/03_trialdata_baselinevalue/learning_phase/7_typens_corrected.pdf
-      * Significance of effect of reflection on use of near-sighted strategies (learning phase)
+      * Significance of effect of reflection on use of no-planning strategies (learning phase)
     * results/tex/03_trialdata_baselinevalue/performance_phase/21_typens_corrected.pdf
-      * Significance of effect of reflection and use of near-sighted strategies in baseline trials on performance (performance phase)
+      * Significance of effect of reflection and use of no-planning strategies in baseline trials on performance (performance phase)
     * results/tex/03_trialdata_baselinevalue/performance_phase/21_typefs_corrected.pdf
       * Significance of effect of reflection on use of far-sighted strategies (performance phase)
     * results/tex/03_trialdata_baselinevalue/performance_phase/followup/21_typefs_corrected.pdf
@@ -121,56 +121,3 @@ Here is information on where the statistics that are reported in the paper can b
     * Significance of effect of NFC x Trial No. on expected score in learning phase
   * results/tex/06_transitiondata_engagement
     * Significance of main effect of High Engagement (HE) on all outcome variables
-  
-* **Appendix Results:**
-  * _Clustering planning strategies_
-    * Run script `00_format_data.R`
-      * Open variable `clusters` in workspace
-      * Expected scores of all strategy clusters
-  * _Reflection led to an increased use of adaptive strategies_
-    * In script `analysis/01_descriptive_stats.R`
-      * Run lines aggregating `adaptive` and `maladaptive` under the section 'Trial data: Learning Rates'
-        * Take note of console output
-        * Slopes of learning curves of use of adaptive strategies 
-      * Open variable `clusters` in workspace
-        * Proportion of trials with adaptive vs. maladaptive strategies in control and experimental groups
-  * _Reflection led to more changes in adaptiveness_
-    * In script `analysis/01_descriptive_stats.R`
-      * Run lines under the sections 'Transition data: Frequency of planning change' and 'Transition data: Average improvement per trial'
-        * Take note of console output
-      * Descriptive statistics for change in adaptiveness levels
-    * results/tex/04_transitiondata_previousvalue/21_cluster-change_corrected.pdf
-      * Significance of effect of reflection on frequency of change in adaptiveness
-    * results/tex/04_transitiondata_previousvalue/21_cluster-magnitude_corrected.pdf
-      * Significance of effect of reflection on magnitude of change in adaptiveness
-  * _Reflection is especially helpful for low performers_
-    * results/tex/03_trialdata_baselinevalue/performance_phase/21_adaptive_corrected.pdf
-    * results/tex/03_trialdata_baselinevalue/performance_phase/21_maladaptive_corrected.pdf
-  * _The frequency of change appears to decrease over time_
-    * In script `analysis/01_descriptive_stats.R`
-      * Run lines aggregating `cluster_change_delta` under the sections 'Temporal Dynamics: Comparison of reflection periods'
-        * Take note of console output
-      * Descriptive statistics of improvement of adaptiveness
-    * In script `analysis/05_transitiondata_temporal.R`
-      * Run section '2 Amount of improvement over time'
-        * Take note of Wilcoxon test results in console output (first result for each of the 3 reflection periods)
-  * _The amount of improvement appears to decrease over time_
-    * In script `analysis/01_descriptive_stats.R`
-    * Run lines aggregating `cluster_change` under the sections 'Temporal Dynamics: Comparison of reflection periods'
-      * Take note of console output
-    * In script `analysis/05_transitiondata_temporal.R`
-      * Run section '3 Amount of change over time'
-      * Take note of results of Chi-squared tests in console output (first result for each of the 3 reflection periods)
-* **Table 7:**
-  * _Learning Phase (trials 3-7):_
-    * Adaptive: results/tex/03_trialdata_baselinevalue/learning_phase/7_adaptive_corrected.pdf
-    * Moderate: results/tex/03_trialdata_baselinevalue/learning_phase/7_moderate_corrected.pdf
-    * Maladaptive: results/tex/03_trialdata_baselinevalue/learning_phase/7_maladaptive_corrected.pdf
-  * _Performance Phase (trials 8-21):_
-    * Adaptive: results/tex/03_trialdata_baselinevalue/performance_phase/21_adaptive_corrected.pdf
-    * Moderate: results/tex/03_trialdata_baselinevalue/performance_phase/21_moderate_corrected.pdf
-    * Maladaptive: results/tex/03_trialdata_baselinevalue/performance_phase/21_maladaptive_corrected.pdf
-* **Table 8:** 
-  * results/tex/03_trialdata_adaptiveness
-* **Table 9:** 
-  * results/tex/04_transitiondata_adaptiveness

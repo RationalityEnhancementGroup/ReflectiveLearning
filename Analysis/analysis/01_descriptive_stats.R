@@ -63,6 +63,11 @@ strategies
 describeBy(trial_frame$number_clicks, trial_frame$reflection)
 
 
+# baseline difference
+df <- subset(trial_frame, index < 2)
+t.test(strategyscore_baseline ~ reflection, df, var.equal = T)
+
+
 # Trial data: Learning Rates ---------------------------------------------------------
 
 # data of learning phase
@@ -124,9 +129,11 @@ summary(df$length)
 sd(df$length)
 
 # engagement over time
-cor.test(df_prompts$engagement, df_prompts$transition)
-
-
+#cor.test(df_prompts$engagement, df_prompts$transition)
+rmcorr(pid, transition, engagement, df_prompts)
+aggregate(engagement ~ transition, df_prompts, FUN = mean)
+round(prop.table(table(subset(df_prompts, transition < 10)$engagement)), 3)
+round(prop.table(table(subset(df_prompts, transition > 10)$engagement)), 3)
 
 # - - only control prompt trials
 df <- subset(df_valid, condition == 1)
@@ -197,7 +204,7 @@ print(p)
 
 
 # Compare adaptiveness and type -------------------------------------------
-prop.table(table(subset(strategies, cluster == 0)$type))
+prop.table(table(subset(trial, cluster == 0)$type))
 # --> the maladaptive cluster consists to 66% of near-sighted strategies and of 33% of others
 
 prop.table(table(subset(strategies, cluster == 1)$type))
@@ -226,3 +233,28 @@ View(subset(strategies, type == 0))
 
 View(subset(strategies, cluster == 2))
 View(subset(strategies, type == 1)) 
+View(subset(strategies, type == 3)) 
+
+# Self-evaluation -------------------------------------------
+
+# only reflection group
+df <- subset(trial_frame, reflection & index == 10)
+
+# stats
+mean(df$sea_lm)
+sd(df$sea_lm)
+hist(df$sea_lm)
+
+hist(df$sea_cor)
+mean(df$sea_cor, na.rm=T)
+sd(df$sea_cor, na.rm=T)
+
+
+hist(df$skill)
+plot(df$sea_cor[!is.na(df$sea_cor)], df$skill[!is.na(df$sea_cor)])
+cor.test(df$sea_cor[!is.na(df$sea_cor)], df$skill[!is.na(df$sea_cor)])
+
+
+
+
+

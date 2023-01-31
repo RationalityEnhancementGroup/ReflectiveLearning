@@ -99,6 +99,7 @@ def getParticipantInfo(dataclip, subject):
         "totalTime": "-",
         "ncs": [],
         "promptsContent": [],
+        "promptsEval": [],
         "promptsRt": [],
         "promptsLengths": [],
         "attemptsQuiz": 0,
@@ -343,10 +344,22 @@ def getParticipantInfo(dataclip, subject):
             elif trial_key in reflection_codes:
                 try:
                     resp = eval(trial["trialdata"]["responses"])
-                    data["promptsContent"].append(resp["Q0"])
 
-                    prompts_lengths_temp.append(len(resp["Q0"]))
-                    prompts_rt_temp.append(trial["trialdata"]["rt"])
+                    if isinstance(resp, dict):
+                        data["promptsContent"].append(resp["Q0"])
+                        prompts_lengths_temp.append(len(resp["Q0"]))
+                        prompts_rt_temp.append(trial["trialdata"]["rt"])
+
+                    else:
+                        coding = {
+                            "Very Well": 5,
+                            "Well": 4,
+                            "Acceptable": 3,
+                            "Poor": 2,
+                            "Very Poor": 1,
+                        }
+                        data["promptsEval"].append(coding[resp[0]])
+
                 except:
                     pass
 

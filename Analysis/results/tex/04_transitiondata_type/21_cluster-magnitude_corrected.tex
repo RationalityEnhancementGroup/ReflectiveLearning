@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\begin{document}
+
+
+\begin{table}[h]
+                    \caption{08-transitiondata cluster-magnitude (21 )}
+                    \label{label}
+                    \centering \begin{tabular}{lllllll}
+                 \toprule
+                 Fixed Effect     & Estimate     & 95\% CI  &  df & $t$ & $p$ & Significance \\
+                 \midrule 
+   (Intercept) & 0 &  [-, -] & 4606 & -0.42 & .781 &   \\ 
+   reflectionTRUE & 0.01 &  [-, -] & 4606 & 0.97 & .537 &   \\ 
+   promptTRUE & 0.01 &  [-, -] & 4606 & 0.3 & .761 &   \\ 
+   ncs & -0.01 &  [-, -] & 4606 & -0.8 & .746 &   \\ 
+   prevtypeotherTRUE & 0.09 &  [-, -] & 4606 & 2.88 & .008 & * \\ 
+   prevtypenpTRUE & 0.05 &  [-, -] & 4606 & 3.13 & .002 & * \\ 
+   prevtypensTRUE & 0.15 &  [-, -] & 4606 & 2.94 & .003 & * \\ 
+   \cmidrule{1-7}
+   reflectionTRUE:promptTRUE & -0.04 &  [-, -] & 4606 & -1.69 & .184 &   \\ 
+   reflectionTRUE:ncs & 0.01 &  [-, -] & 4606 & 0.7 & .605 &   \\ 
+   promptTRUE:ncs & 0.03 &  [-, -] & 4606 & 2.09 & .073 &   \\ 
+   reflectionTRUE:prevtypeotherTRUE & 0 &  [-, -] & 4606 & -0.11 & .914 &   \\ 
+   promptTRUE:prevtypeotherTRUE & -0.03 &  [-, -] & 4606 & -0.59 & .953 &   \\ 
+   reflectionTRUE:prevtypenpTRUE & 0.02 &  [-, -] & 4606 & 0.69 & .489 &   \\ 
+   promptTRUE:prevtypenpTRUE & 0.01 &  [-, -] & 4606 & 0.29 & .783 &   \\ 
+   reflectionTRUE:prevtypensTRUE & 0.18 &  [-, -] & 4606 & 2.66 & .016 & * \\ 
+   promptTRUE:prevtypensTRUE & -0.15 &  [-, -] & 4606 & -1.69 & .091 &   \\ 
+   \cmidrule{1-7}
+   reflectionTRUE:promptTRUE:ncs & -0.03 &  [-, -] & 4606 & -1.4 & .23 &   \\ 
+   reflectionTRUE:promptTRUE:prevtypeotherTRUE & 0.08 &  [-, -] & 4606 & 1.16 & .493 &   \\ 
+   reflectionTRUE:promptTRUE:prevtypenpTRUE & 0.07 &  [-, -] & 4606 & 1.72 & .095 &   \\ 
+   reflectionTRUE:promptTRUE:prevtypensTRUE & 0.29 &  [-, -] & 4606 & 2.62 & .009 & * \\ 
+   \bottomrule
+          \end{tabular}
+          \end{table}
+boundary (singular) fit: see help('isSingular')  \\
+
+
+\end{document}

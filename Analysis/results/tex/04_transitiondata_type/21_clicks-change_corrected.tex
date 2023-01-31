@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\begin{document}
+
+
+\begin{table}[h]
+                    \caption{08-transitiondata clicks-change (21 )}
+                    \label{label}
+                    \centering  \begin{tabular}{llllll}
+                 \toprule
+                 Fixed Effect     & Estimate     & 95\% CI  & $z$ & $p$ & Significance \\
+                 \midrule 
+   (Intercept) & 1.44 &  [-, -] & 8.42 & <.001 & * \\ 
+   reflectionTRUE & -0.06 &  [-, -] & -0.27 & .786 &   \\ 
+   promptTRUE & 0.25 &  [-, -] & 1.47 & .257 &   \\ 
+   ncs & 0.11 &  [-, -] & 0.79 & .761 &   \\ 
+   prevtypeotherTRUE & 0.66 &  [-, -] & 1.64 & .203 &   \\ 
+   prevtypenpTRUE & -3.38 &  [-, -] & -13.54 & <.001 & * \\ 
+   prevtypensTRUE & -2.15 &  [-, -] & -3.79 & <.001 & * \\ 
+   \cmidrule{1-6}
+   reflectionTRUE:promptTRUE & 0.09 &  [-, -] & 0.39 & .693 &   \\ 
+   reflectionTRUE:ncs & 0.2 &  [-, -] & 0.97 & .626 &   \\ 
+   promptTRUE:ncs & -0.1 &  [-, -] & -0.79 & .864 &   \\ 
+   reflectionTRUE:prevtypeotherTRUE & -0.8 &  [-, -] & -1.68 & .185 &   \\ 
+   promptTRUE:prevtypeotherTRUE & -0.98 &  [-, -] & -1.94 & .105 &   \\ 
+   reflectionTRUE:prevtypenpTRUE & 1.08 &  [-, -] & 3.11 & .004 & * \\ 
+   promptTRUE:prevtypenpTRUE & -0.17 &  [-, -] & -0.57 & .806 &   \\ 
+   reflectionTRUE:prevtypensTRUE & 1.77 &  [-, -] & 2.45 & .029 & * \\ 
+   promptTRUE:prevtypensTRUE & 0.21 &  [-, -] & 0.31 & .755 &   \\ 
+   \cmidrule{1-6}
+   reflectionTRUE:promptTRUE:ncs & -0.01 &  [-, -] & -0.05 & .958 &   \\ 
+   reflectionTRUE:promptTRUE:prevtypeotherTRUE & 1.18 &  [-, -] & 1.88 & .119 &   \\ 
+   reflectionTRUE:promptTRUE:prevtypenpTRUE & 0.93 &  [-, -] & 2.29 & .044 & * \\ 
+   reflectionTRUE:promptTRUE:prevtypensTRUE & 0.23 &  [-, -] & 0.24 & .947 &   \\ 
+   \bottomrule
+          \end{tabular}
+          \end{table}
+
+
+\end{document}

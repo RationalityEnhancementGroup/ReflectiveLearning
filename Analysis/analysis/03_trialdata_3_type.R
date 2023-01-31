@@ -6,7 +6,7 @@
 source("00_format_data.R")
 
 # pick learning or performance phase
-performance_phase <- FALSE
+performance_phase <- TRUE
 
 # 0 Models -----------------------------------------------------------------
 if(performance_phase) N <- 7:21 else N <- 3:7
@@ -20,6 +20,8 @@ model_formula <- "reflection +
                   type_other_b:index + type_other_b:index:reflection + 
                   type_ns_b + type_ns_b:reflection + 
                   type_ns_b:index + type_ns_b:index:reflection + 
+                  type_np_b + type_np_b:reflection + 
+                  type_np_b:index + type_np_b:index:reflection + 
                   (1|pid)"
 
 model_path <- paste('03_trialdata_type/', phase, '/', sep = '')
@@ -37,6 +39,7 @@ df$ncs <- scale(df$ncs, scale = scale_variables)
 df$type_fs_b <- scale(df$type_fs_baseline, scale = scale_variables) 
 df$type_ns_b <- scale(df$type_ns_baseline, scale = scale_variables)
 df$type_other_b <- scale(df$type_other_baseline, scale = scale_variables)
+df$type_np_b <- scale(df$type_np_baseline, scale = scale_variables)
 
 # 2 Score -----------------------------------------------------------------
 

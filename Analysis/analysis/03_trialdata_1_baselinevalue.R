@@ -6,7 +6,7 @@
 source("00_format_data.R")
 
 # pick learning or performance phase
-performance_phase <- TRUE
+performance_phase <- FALSE
 
 # 0 Models -----------------------------------------------------------------
 if(performance_phase) N <- 7:21 else N <- 3:7
@@ -114,12 +114,30 @@ storeModel(model, model_path, sprintf('%i_clicks', max(N)),  sprintf('07-trialda
 
 # 7 Strategy Type -----------------------------------------------------------------
 
+# ------ far sighted type
+# model
+df$baseline <- scale(df$type_fs_baseline, scale = scale_variables)
+model <- fitModel_glm('type_fs', model_formula, df)
+
+# store model
+storeModel(model, model_path, sprintf('%i_typefs', max(N)),  sprintf('07-trialdata far-sighted (%i )',max(N)),
+           'glm')
+
+# ------ other type
+# model
+df$baseline <- scale(df$type_other_baseline, scale = scale_variables)
+model <- fitModel_glm('type_other', model_formula, df)
+
+# store model
+storeModel(model, model_path, sprintf('%i_typeother', max(N)),  sprintf('07-trialdata other (%i )',max(N)),
+           'glm')
+
+
 # ------ near sighted type
 # model
 df$baseline <- scale(df$type_ns_baseline, scale = scale_variables)
 
 if(performance_phase){
-  df$baseline <- df$baseline-1
   model <- fitModel_glm('type_ns', model_formula, df)
   
 } else {
@@ -130,36 +148,24 @@ if(performance_phase){
 storeModel(model, model_path, sprintf('%i_typens', max(N)),  sprintf('07-trialdata near-sighted (%i )',max(N)),
            'glm')
 
-
-# ------ far sighted type
+# ------ no-planning type
 # model
-df$baseline <- scale(df$type_fs_baseline, scale = scale_variables)
-model <- fitModel_glm('type_fs', model_formula, df)
+df$baseline <- scale(df$type_np_baseline, scale = scale_variables)
+model <- fitModel_glm('type_np', model_formula, df)
 
 # store model
-storeModel(model, model_path, sprintf('%i_typefs', max(N)),  sprintf('07-trialdata far-sighted (%i )',max(N)),
+storeModel(model, model_path, sprintf('%i_typenp', max(N)),  sprintf('07-trialdata np-planning (%i )',max(N)),
            'glm')
-
-
-# ------ other mode
-# model
-df$baseline <- scale(df$type_other_baseline, scale = scale_variables)
-model <- fitModel_glm('type_other', model_formula, df)
-
-# store model
-storeModel(model, model_path, sprintf('%i_typeother', max(N)),  sprintf('07-trialdata other (%i )',max(N)),
-           'glm')
-
 
 # ------ Correction
-model_names <- c('typens', 'typefs', 'typeother')
+model_names <- c('typens', 'typefs', 'typeother', 'typenp')
 applyBHCorection(model_names, '07-trialdata')
 
 
 # Johnson Neyman ----------------------------------------------------------
 if(performance_phase){
   
-  model_names <- c('score', 'strategyscore', 'clicks', 'adaptive', 'moderate', 'maladaptive', 'typens', 'typefs')
+  model_names <- c('score', 'strategyscore', 'clicks', 'adaptive', 'moderate', 'maladaptive', 'typenp', 'typefs')
   print('The johnson neyman intervals for main effect of reflection translated into percentiles of the baseline distribution:')
   for(model_name in model_names){
     load(sprintf('../results/models/%s%i_%s.RData', model_path, 21, model_name))
@@ -178,8 +184,8 @@ if(performance_phase){
 
 model_path <- paste('03_trialdata_baselinevalue/', phase, '/followup/', sep = '')
 
-# evaluate all with the near-sighted baseline
-df$baseline <- scale(df$type_ns_baseline, scale = scale_variables)
+# evaluate all with the no-planning baseline
+df$baseline <- scale(df$type_np_baseline, scale = scale_variables) - 1 
 
 
 # ------ far sighted type
@@ -191,23 +197,9 @@ storeModel(model, model_path, sprintf('%i_typefs', max(N)),  sprintf('07-trialda
            'glm')
 
 
-# ------ other type
-# model
-model <- fitModel_glm('type_other', model_formula, df)
-
-# store model
-storeModel(model, model_path, sprintf('%i_typeother', max(N)),  sprintf('07-trialdata other (%i )',max(N)),
-           'glm')
-
-
-# ------ Correction
-model_names <- c('typefs', 'typeother')
-applyBHCorection(model_names, '07-trialdata')
-
-
 # - - - - Johnson Neyman
 if(performance_phase){
-  model_names <- c('typens', 'typefs', 'typeother')
+  model_names <- c('typefs')
   print('The johnson neyman intervals for main effect of reflection translated into percentiles of the baseline distribution:')
   for(model_name in model_names){
     load(sprintf('../results/models/%s%i_%s.RData', model_path, 21, model_name))
